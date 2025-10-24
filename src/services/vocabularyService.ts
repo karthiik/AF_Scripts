@@ -14,7 +14,7 @@ import {
   Timestamp,
 } from 'firebase/firestore';
 import { db } from './firebase';
-import { VocabularyCard, UserVocabularyProgress } from '../types';
+import { VocabularyCard, UserVocabularyProgress, VocabularyLevel } from '../types';
 
 /**
  * Create a new vocabulary card
@@ -59,6 +59,7 @@ export const getVocabularyCard = async (cardId: string): Promise<VocabularyCard 
       back: data.back,
       example: data.example,
       difficulty: data.difficulty,
+      level: data.level || VocabularyLevel.BEGINNER, // Default to beginner if not set
       createdAt: data.createdAt?.toDate() || new Date(),
       createdBy: data.createdBy,
     };
@@ -82,6 +83,7 @@ export const getAllVocabularyCards = async (): Promise<VocabularyCard[]> => {
         back: data.back,
         example: data.example,
         difficulty: data.difficulty,
+        level: data.level || VocabularyLevel.BEGINNER, // Default to beginner if not set
         createdAt: data.createdAt?.toDate() || new Date(),
         createdBy: data.createdBy,
       };
@@ -281,6 +283,36 @@ export const getMasteredCardsCount = async (userId: string): Promise<number> => 
 };
 
 /**
+ * Get vocabulary cards by level
+ */
+export const getVocabularyCardsByLevel = async (
+  level: VocabularyLevel
+): Promise<VocabularyCard[]> => {
+  try {
+    const cardsQuery = query(
+      collection(db, 'vocabularyCards'),
+      where('level', '==', level)
+    );
+    const cardsSnapshot = await getDocs(cardsQuery);
+    return cardsSnapshot.docs.map(doc => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        front: data.front,
+        back: data.back,
+        example: data.example,
+        difficulty: data.difficulty,
+        level: data.level || VocabularyLevel.BEGINNER,
+        createdAt: data.createdAt?.toDate() || new Date(),
+        createdBy: data.createdBy,
+      };
+    });
+  } catch (error: any) {
+    throw new Error(`Failed to get vocabulary cards by level: ${error.message}`);
+  }
+};
+
+/**
  * Bulk import vocabulary cards from array
  */
 export const bulkImportVocabularyCards = async (
@@ -288,11 +320,87 @@ export const bulkImportVocabularyCards = async (
   createdBy: string
 ): Promise<void> => {
   try {
+    console.log(`📥 Starting bulk import of ${cards.length} cards...`);
     const promises = cards.map(card =>
       createVocabularyCard({ ...card, createdBy })
     );
     await Promise.all(promises);
+    console.log(`✅ Successfully imported ${cards.length} cards`);
   } catch (error: any) {
+    console.error('❌ Bulk import error:', error);
     throw new Error(`Failed to bulk import vocabulary cards: ${error.message}`);
   }
+};
+
+/**
+ * Parse Excel file and return vocabulary cards
+ * Expected Excel format:
+ * Column A: Word (front)
+ * Column B: Definition (back)
+ * Column C: Example (optional)
+ * Column D: Difficulty (1-5, optional)
+ */
+export const parseExcelFile = async (
+  file: File,
+  level: VocabularyLevel = VocabularyLevel.BEGINNER
+): Promise<Omit<VocabularyCard, 'id' | 'createdAt' | 'createdBy'>[]> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+
+    reader.onload = async (e) => {
+      try {
+        const data = e.target?.result;
+        if (!data) {
+          throw new Error('Failed to read file');
+        }
+
+        // Dynamic import to reduce bundle size
+        const XLSX = await import('xlsx');
+
+        const workbook = XLSX.read(data, { type: 'binary' });
+        const sheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[sheetName];
+
+        // Convert to JSON
+        const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+
+        // Parse rows (skip header row)
+        const cards: Omit<VocabularyCard, 'id' | 'createdAt' | 'createdBy'>[] = [];
+
+        for (let i = 1; i < jsonData.length; i++) {
+          const row = jsonData[i] as any[];
+
+          // Skip empty rows
+          if (!row || !row[0] || !row[1]) continue;
+
+          const word = String(row[0]).trim();
+          const definition = String(row[1]).trim();
+          const example = row[2] ? String(row[2]).trim() : undefined;
+          const difficulty = row[3] ? Math.min(5, Math.max(1, Number(row[3]))) : 1;
+
+          if (word && definition) {
+            cards.push({
+              front: word,
+              back: definition,
+              example,
+              difficulty,
+              level,
+            });
+          }
+        }
+
+        console.log(`📊 Parsed ${cards.length} vocabulary cards from Excel`);
+        resolve(cards);
+      } catch (error: any) {
+        console.error('❌ Excel parsing error:', error);
+        reject(new Error(`Failed to parse Excel file: ${error.message}`));
+      }
+    };
+
+    reader.onerror = () => {
+      reject(new Error('Failed to read file'));
+    };
+
+    reader.readAsBinaryString(file);
+  });
 };

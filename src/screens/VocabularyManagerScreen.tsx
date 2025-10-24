@@ -10,13 +10,15 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RootStackParamList, VocabularyCard, UserRole } from '../types';
+import { RootStackParamList, VocabularyCard, UserRole, VocabularyLevel } from '../types';
 import { useAuth } from '../contexts/AuthContext';
 import {
   getAllVocabularyCards,
   createVocabularyCard,
   updateVocabularyCard,
   deleteVocabularyCard,
+  parseExcelFile,
+  bulkImportVocabularyCards,
 } from '../services/vocabularyService';
 
 type VocabularyManagerScreenProps = {
@@ -36,6 +38,11 @@ const VocabularyManagerScreen: React.FC<VocabularyManagerScreenProps> = ({
   const [newBack, setNewBack] = useState('');
   const [newExample, setNewExample] = useState('');
   const [newDifficulty, setNewDifficulty] = useState('1');
+  const [newLevel, setNewLevel] = useState<VocabularyLevel>(VocabularyLevel.BEGINNER);
+
+  // Excel import
+  const [importing, setImporting] = useState(false);
+  const [selectedLevel, setSelectedLevel] = useState<VocabularyLevel>(VocabularyLevel.BEGINNER);
 
   // Edit mode
   const [editingCard, setEditingCard] = useState<VocabularyCard | null>(null);
@@ -78,6 +85,7 @@ const VocabularyManagerScreen: React.FC<VocabularyManagerScreenProps> = ({
         back: newBack,
         example: newExample || undefined,
         difficulty: parseInt(newDifficulty) || 1,
+        level: newLevel,
         createdBy: user.id,
       });
 
@@ -85,12 +93,58 @@ const VocabularyManagerScreen: React.FC<VocabularyManagerScreenProps> = ({
       setNewBack('');
       setNewExample('');
       setNewDifficulty('1');
+      setNewLevel(VocabularyLevel.BEGINNER);
       setShowAddCard(false);
 
       await loadCards();
-      Alert.alert('Success', 'Vocabulary card added!');
+      alert('Vocabulary card added!');
     } catch (error: any) {
-      Alert.alert('Error', error.message);
+      alert(`Error: ${error.message}`);
+    }
+  };
+
+  const handleExcelImport = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (!user) return;
+
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    console.log('📂 Excel file selected:', file.name);
+
+    setImporting(true);
+    try {
+      // Parse Excel file
+      const parsedCards = await parseExcelFile(file, selectedLevel);
+      console.log(`✅ Parsed ${parsedCards.length} cards from Excel`);
+
+      if (parsedCards.length === 0) {
+        alert('No vocabulary cards found in Excel file. Please check the format.');
+        return;
+      }
+
+      // Confirm import
+      const confirmImport = confirm(
+        `Import ${parsedCards.length} vocabulary cards at ${selectedLevel} level?\n\nExpected format:\nColumn A: Word\nColumn B: Definition\nColumn C: Example (optional)\nColumn D: Difficulty 1-5 (optional)`
+      );
+
+      if (!confirmImport) {
+        console.log('❌ Import cancelled by user');
+        return;
+      }
+
+      // Bulk import to Firestore
+      await bulkImportVocabularyCards(parsedCards, user.id);
+
+      alert(`Successfully imported ${parsedCards.length} vocabulary cards!`);
+      await loadCards();
+
+      // Reset file input
+      event.target.value = '';
+    } catch (error: any) {
+      console.error('❌ Excel import error:', error);
+      alert(`Failed to import Excel file: ${error.message}`);
+    } finally {
+      setImporting(false);
     }
   };
 
@@ -206,11 +260,91 @@ const VocabularyManagerScreen: React.FC<VocabularyManagerScreenProps> = ({
             </View>
           </View>
 
+          <View style={styles.levelContainer}>
+            <Text style={styles.label}>Level:</Text>
+            <View style={styles.levelButtons}>
+              {Object.values(VocabularyLevel).map(level => (
+                <TouchableOpacity
+                  key={level}
+                  style={[
+                    styles.levelButton,
+                    newLevel === level && styles.levelButtonActive,
+                  ]}
+                  onPress={() => setNewLevel(level)}
+                >
+                  <Text
+                    style={[
+                      styles.levelButtonText,
+                      newLevel === level && styles.levelButtonTextActive,
+                    ]}
+                  >
+                    {level.charAt(0).toUpperCase() + level.slice(1)}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+
           <TouchableOpacity style={styles.createButton} onPress={handleAddCard}>
             <Text style={styles.createButtonText}>Add Card</Text>
           </TouchableOpacity>
         </View>
       )}
+
+      {/* Excel Import Section */}
+      <View style={styles.importSection}>
+        <Text style={styles.sectionTitle}>Import from Excel</Text>
+
+        <View style={styles.levelSelectContainer}>
+          <Text style={styles.label}>Import Level:</Text>
+          <View style={styles.levelButtons}>
+            {Object.values(VocabularyLevel).map(level => (
+              <TouchableOpacity
+                key={level}
+                style={[
+                  styles.levelButton,
+                  selectedLevel === level && styles.levelButtonActive,
+                ]}
+                onPress={() => setSelectedLevel(level)}
+                disabled={importing}
+              >
+                <Text
+                  style={[
+                    styles.levelButtonText,
+                    selectedLevel === level && styles.levelButtonTextActive,
+                  ]}
+                >
+                  {level.charAt(0).toUpperCase() + level.slice(1)}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
+
+        <View style={styles.importButtonContainer}>
+          <input
+            type="file"
+            accept=".xlsx,.xls"
+            onChange={handleExcelImport}
+            style={{ display: 'none' }}
+            id="excel-upload"
+            disabled={importing}
+          />
+          <TouchableOpacity
+            style={[styles.importButton, importing && styles.importButtonDisabled]}
+            onPress={() => document.getElementById('excel-upload')?.click()}
+            disabled={importing}
+          >
+            <Text style={styles.importButtonText}>
+              {importing ? 'Importing...' : '📤 Import Excel File'}
+            </Text>
+          </TouchableOpacity>
+        </View>
+
+        <Text style={styles.helpText}>
+          Excel format: Column A: Word | Column B: Definition | Column C: Example (optional) | Column D: Difficulty 1-5 (optional)
+        </Text>
+      </View>
 
       {/* Cards List */}
       <ScrollView style={styles.cardsList}>
@@ -522,6 +656,72 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#666',
     fontWeight: '600',
+  },
+  levelContainer: {
+    marginBottom: 15,
+  },
+  levelButtons: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  levelButton: {
+    flex: 1,
+    padding: 10,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: '#e5e7eb',
+    backgroundColor: '#fff',
+    alignItems: 'center',
+  },
+  levelButtonActive: {
+    backgroundColor: '#6366f1',
+    borderColor: '#6366f1',
+  },
+  levelButtonText: {
+    fontSize: 13,
+    color: '#666',
+  },
+  levelButtonTextActive: {
+    color: '#fff',
+    fontWeight: '600',
+  },
+  importSection: {
+    backgroundColor: '#fff',
+    padding: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e5e7eb',
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 15,
+  },
+  levelSelectContainer: {
+    marginBottom: 15,
+  },
+  importButtonContainer: {
+    marginBottom: 10,
+  },
+  importButton: {
+    backgroundColor: '#10b981',
+    padding: 15,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  importButtonDisabled: {
+    backgroundColor: '#9ca3af',
+  },
+  importButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  helpText: {
+    fontSize: 12,
+    color: '#666',
+    fontStyle: 'italic',
+    lineHeight: 18,
   },
 });
 

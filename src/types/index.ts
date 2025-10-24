@@ -15,12 +15,19 @@ export interface User {
 }
 
 // Vocabulary Types
+export enum VocabularyLevel {
+  BEGINNER = 'beginner',
+  INTERMEDIATE = 'intermediate',
+  EXPERT = 'expert',
+}
+
 export interface VocabularyCard {
   id: string;
   front: string; // The word
   back: string; // The definition
   example?: string; // Optional usage example
   difficulty?: number; // 1-5 scale
+  level: VocabularyLevel; // Beginner, Intermediate, or Expert
   createdAt: Date;
   createdBy: string; // User ID who created it
 }
