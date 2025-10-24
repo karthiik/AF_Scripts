@@ -24,15 +24,21 @@ export const registerUser = async (
   displayName: string,
   role: UserRole
 ): Promise<User> => {
+  console.log('🔥 authService: registerUser called', { email, displayName, role });
   try {
     // Create Firebase auth user
+    console.log('🔥 Creating Firebase auth user...');
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const firebaseUser = userCredential.user;
+    console.log('✅ Firebase auth user created:', firebaseUser.uid);
 
     // Update display name
+    console.log('📝 Updating display name...');
     await updateProfile(firebaseUser, { displayName });
+    console.log('✅ Display name updated');
 
     // Create user document in Firestore
+    console.log('💾 Creating Firestore user document...');
     const userData: Omit<User, 'id'> = {
       email,
       displayName,
@@ -46,12 +52,17 @@ export const registerUser = async (
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
     });
+    console.log('✅ Firestore user document created');
 
+    console.log('🎉 Registration complete!');
     return {
       id: firebaseUser.uid,
       ...userData,
     };
   } catch (error: any) {
+    console.error('❌ authService error:', error);
+    console.error('Error code:', error.code);
+    console.error('Error message:', error.message);
     throw new Error(`Registration failed: ${error.message}`);
   }
 };

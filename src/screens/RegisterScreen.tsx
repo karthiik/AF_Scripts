@@ -28,28 +28,39 @@ const RegisterScreen: React.FC<RegisterScreenProps> = ({ navigation }) => {
   const { register } = useAuth();
 
   const handleRegister = async () => {
+    console.log('🚀 Register button clicked!');
+    console.log('Form data:', { email, displayName, role, hasPassword: !!password });
+
     if (!email || !password || !confirmPassword || !displayName) {
-      Alert.alert('Error', 'Please fill in all fields');
+      console.error('❌ Validation failed: Missing fields');
+      alert('Please fill in all fields');
       return;
     }
 
     if (password !== confirmPassword) {
-      Alert.alert('Error', 'Passwords do not match');
+      console.error('❌ Validation failed: Passwords do not match');
+      alert('Passwords do not match');
       return;
     }
 
     if (password.length < 6) {
-      Alert.alert('Error', 'Password must be at least 6 characters');
+      console.error('❌ Validation failed: Password too short');
+      alert('Password must be at least 6 characters');
       return;
     }
 
+    console.log('✅ Validation passed, starting registration...');
     setLoading(true);
     try {
+      console.log('📡 Calling Firebase register...');
       await register(email, password, displayName, role);
+      console.log('✅ Registration successful!');
     } catch (error: any) {
-      Alert.alert('Registration Failed', error.message);
+      console.error('❌ Registration error:', error);
+      alert(`Registration Failed: ${error.message}`);
     } finally {
       setLoading(false);
+      console.log('🏁 Registration process complete');
     }
   };
 
