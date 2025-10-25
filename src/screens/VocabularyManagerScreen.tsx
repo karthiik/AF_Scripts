@@ -6,7 +6,6 @@ import {
   TouchableOpacity,
   StyleSheet,
   ScrollView,
-  Alert,
   ActivityIndicator,
 } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -50,9 +49,8 @@ const VocabularyManagerScreen: React.FC<VocabularyManagerScreenProps> = ({
 
   useEffect(() => {
     if (user?.role !== UserRole.PARENT) {
-      Alert.alert('Access Denied', 'Only parents can manage vocabulary', [
-        { text: 'OK', onPress: () => navigation.goBack() },
-      ]);
+      alert('Access Denied: Only parents can manage vocabulary');
+      navigation.goBack();
       return;
     }
 
@@ -66,7 +64,7 @@ const VocabularyManagerScreen: React.FC<VocabularyManagerScreenProps> = ({
       setCards(allCards);
     } catch (error) {
       console.error('Error loading cards:', error);
-      Alert.alert('Error', 'Failed to load vocabulary cards');
+      alert('Failed to load vocabulary cards');
     } finally {
       setLoading(false);
     }
@@ -76,7 +74,7 @@ const VocabularyManagerScreen: React.FC<VocabularyManagerScreenProps> = ({
     if (!user) return;
 
     if (!newFront || !newBack) {
-      Alert.alert('Error', 'Please fill in word and definition');
+      alert('Please fill in word and definition');
       return;
     }
 
@@ -162,29 +160,23 @@ const VocabularyManagerScreen: React.FC<VocabularyManagerScreenProps> = ({
 
       setEditingCard(null);
       await loadCards();
-      Alert.alert('Success', 'Card updated!');
+      alert('Card updated!');
     } catch (error: any) {
-      Alert.alert('Error', error.message);
+      alert(`Error: ${error.message}`);
     }
   };
 
   const handleDeleteCard = async (cardId: string) => {
-    Alert.alert('Delete Card', 'Are you sure you want to delete this card?', [
-      { text: 'Cancel', style: 'cancel' },
-      {
-        text: 'Delete',
-        style: 'destructive',
-        onPress: async () => {
-          try {
-            await deleteVocabularyCard(cardId);
-            await loadCards();
-            Alert.alert('Success', 'Card deleted!');
-          } catch (error: any) {
-            Alert.alert('Error', error.message);
-          }
-        },
-      },
-    ]);
+    const confirmed = confirm('Are you sure you want to delete this card?');
+    if (!confirmed) return;
+
+    try {
+      await deleteVocabularyCard(cardId);
+      await loadCards();
+      alert('Card deleted!');
+    } catch (error: any) {
+      alert(`Error: ${error.message}`);
+    }
   };
 
   const handleDeleteAll = async () => {

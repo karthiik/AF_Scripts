@@ -6,7 +6,6 @@ import {
   TouchableOpacity,
   StyleSheet,
   ScrollView,
-  Alert,
   ActivityIndicator,
 } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -43,9 +42,8 @@ const AdminPanelScreen: React.FC<AdminPanelScreenProps> = ({ navigation }) => {
 
   useEffect(() => {
     if (user?.role !== UserRole.PARENT) {
-      Alert.alert('Access Denied', 'Only parents can access the admin panel', [
-        { text: 'OK', onPress: () => navigation.goBack() },
-      ]);
+      alert('Access Denied: Only parents can access the admin panel');
+      navigation.goBack();
       return;
     }
 
@@ -80,7 +78,7 @@ const AdminPanelScreen: React.FC<AdminPanelScreenProps> = ({ navigation }) => {
     if (!user) return;
 
     if (!newRewardTitle || !newRewardTarget || !newRewardAmount) {
-      Alert.alert('Error', 'Please fill in all fields');
+      alert('Please fill in all fields');
       return;
     }
 
@@ -104,9 +102,9 @@ const AdminPanelScreen: React.FC<AdminPanelScreenProps> = ({ navigation }) => {
       setShowAddReward(false);
 
       await loadAdminData();
-      Alert.alert('Success', 'Reward rule created!');
+      alert('Reward rule created!');
     } catch (error: any) {
-      Alert.alert('Error', error.message);
+      alert(`Error: ${error.message}`);
     }
   };
 
@@ -115,35 +113,29 @@ const AdminPanelScreen: React.FC<AdminPanelScreenProps> = ({ navigation }) => {
       await updateRewardRule(rule.id, { isActive: !rule.isActive });
       await loadAdminData();
     } catch (error: any) {
-      Alert.alert('Error', error.message);
+      alert(`Error: ${error.message}`);
     }
   };
 
   const handleDeleteRule = async (ruleId: string) => {
-    Alert.alert('Delete Rule', 'Are you sure you want to delete this reward rule?', [
-      { text: 'Cancel', style: 'cancel' },
-      {
-        text: 'Delete',
-        style: 'destructive',
-        onPress: async () => {
-          try {
-            await deleteRewardRule(ruleId);
-            await loadAdminData();
-          } catch (error: any) {
-            Alert.alert('Error', error.message);
-          }
-        },
-      },
-    ]);
+    const confirmed = confirm('Are you sure you want to delete this reward rule?');
+    if (!confirmed) return;
+
+    try {
+      await deleteRewardRule(ruleId);
+      await loadAdminData();
+    } catch (error: any) {
+      alert(`Error: ${error.message}`);
+    }
   };
 
   const handleMarkAsPaid = async (rewardId: string) => {
     try {
       await markRewardAsPaid(rewardId);
       await loadAdminData();
-      Alert.alert('Success', 'Reward marked as paid!');
+      alert('Reward marked as paid!');
     } catch (error: any) {
-      Alert.alert('Error', error.message);
+      alert(`Error: ${error.message}`);
     }
   };
 
