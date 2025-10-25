@@ -37,56 +37,74 @@ const QuizScreen: React.FC<QuizScreenProps> = ({ navigation }) => {
   const loadQuiz = async () => {
     if (!user) return;
 
+    console.log('🎯 Loading quiz for user:', user.id);
     setLoading(true);
     try {
       // Check if quiz already completed today
+      console.log('🔍 Checking if quiz completed today...');
       const completed = await hasCompletedTodayQuiz(user.id);
+      console.log('Quiz completed today?', completed);
+
       if (completed) {
-        Alert.alert(
-          'Quiz Completed',
-          'You have already completed today\'s quiz. Come back tomorrow!',
-          [{ text: 'OK', onPress: () => navigation.goBack() }]
-        );
+        alert('You have already completed today\'s quiz. Come back tomorrow!');
+        navigation.goBack();
         return;
       }
 
       // Get quiz cards
+      console.log('📚 Getting daily quiz cards...');
       const cards = await getDailyQuizCards(user.id);
+      console.log(`Found ${cards.length} cards for quiz`);
 
       if (cards.length === 0) {
-        Alert.alert(
-          'No Vocabulary',
-          'No vocabulary cards available. Please ask a parent to add some vocabulary words.',
-          [{ text: 'OK', onPress: () => navigation.goBack() }]
-        );
+        alert('No vocabulary cards available. Please ask a parent to add some vocabulary words.');
+        navigation.goBack();
         return;
       }
 
       // Get all cards for generating distractors
+      console.log('🎲 Getting all cards for multiple choice options...');
       const allCards = await getAllVocabularyCards();
+      console.log(`Total vocabulary: ${allCards.length} cards`);
 
       // Generate questions
+      console.log('🎨 Generating quiz questions...');
       const quizQuestions = await generateQuizQuestions(cards, allCards);
+      console.log('Quiz questions generated:', quizQuestions.length);
+
       setQuestions(quizQuestions);
       setQuestionStartTime(Date.now());
+      console.log('✅ Quiz loaded successfully!');
     } catch (error) {
-      console.error('Error loading quiz:', error);
-      Alert.alert('Error', 'Failed to load quiz. Please try again.');
+      console.error('❌ Error loading quiz:', error);
+      alert('Failed to load quiz. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
   const handleAnswerSelect = (answer: string) => {
+    console.log('✅ Answer selected:', answer);
     setSelectedAnswer(answer);
   };
 
   const handleNext = async () => {
-    if (!selectedAnswer || !user) return;
+    console.log('⏭️ Next button clicked');
+    console.log('Selected answer:', selectedAnswer);
+    console.log('User:', user?.id);
 
+    if (!selectedAnswer || !user) {
+      console.warn('❌ Cannot proceed: missing answer or user');
+      return;
+    }
+
+    console.log('🎯 Processing answer...');
     const currentQuestion = questions[currentQuestionIndex];
     const isCorrect = selectedAnswer === currentQuestion.correctAnswer;
     const timeSpent = Math.round((Date.now() - questionStartTime) / 1000);
+
+    console.log(`Answer is ${isCorrect ? 'CORRECT ✅' : 'WRONG ❌'}`);
+    console.log(`Time spent: ${timeSpent} seconds`);
 
     // Save answer
     const newAnswers = [
@@ -101,15 +119,18 @@ const QuizScreen: React.FC<QuizScreenProps> = ({ navigation }) => {
     ];
     setAnswers(newAnswers);
 
+    console.log('💾 Updating user progress...');
     // Update user's progress for this card
     await updateUserCardProgress(user.id, currentQuestion.card.id, isCorrect);
 
     // Move to next question or finish quiz
     if (currentQuestionIndex < questions.length - 1) {
+      console.log(`➡️ Moving to question ${currentQuestionIndex + 2}/${questions.length}`);
       setCurrentQuestionIndex(currentQuestionIndex + 1);
       setSelectedAnswer(null);
       setQuestionStartTime(Date.now());
     } else {
+      console.log('🏁 Finishing quiz...');
       // Quiz completed
       await finishQuiz(newAnswers);
     }
