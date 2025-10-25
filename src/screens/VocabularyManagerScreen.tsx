@@ -17,6 +17,7 @@ import {
   createVocabularyCard,
   updateVocabularyCard,
   deleteVocabularyCard,
+  deleteAllVocabularyCards,
   parseExcelFile,
   bulkImportVocabularyCards,
 } from '../services/vocabularyService';
@@ -186,6 +187,29 @@ const VocabularyManagerScreen: React.FC<VocabularyManagerScreenProps> = ({
     ]);
   };
 
+  const handleDeleteAll = async () => {
+    const confirmDelete = confirm(
+      `⚠️ WARNING: Delete ALL ${cards.length} vocabulary cards?\n\nThis action CANNOT be undone!\n\nType 'DELETE' to confirm.`
+    );
+
+    if (!confirmDelete) {
+      console.log('❌ Mass delete cancelled');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const deletedCount = await deleteAllVocabularyCards();
+      await loadCards();
+      alert(`✅ Successfully deleted ${deletedCount} vocabulary cards!`);
+    } catch (error: any) {
+      console.error('❌ Delete all error:', error);
+      alert(`Failed to delete all cards: ${error.message}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
@@ -197,13 +221,32 @@ const VocabularyManagerScreen: React.FC<VocabularyManagerScreenProps> = ({
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Vocabulary Cards</Text>
-        <TouchableOpacity onPress={() => setShowAddCard(!showAddCard)}>
-          <Text style={styles.addButton}>
-            {showAddCard ? '− Cancel' : '+ Add Card'}
-          </Text>
-        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Vocabulary Cards ({cards.length})</Text>
+        <View style={styles.headerButtons}>
+          <TouchableOpacity onPress={() => setShowAddCard(!showAddCard)}>
+            <Text style={styles.addButton}>
+              {showAddCard ? '− Cancel' : '+ Add Card'}
+            </Text>
+          </TouchableOpacity>
+        </View>
       </View>
+
+      {/* Delete All Button (for troubleshooting) */}
+      {cards.length > 0 && (
+        <View style={styles.deleteAllContainer}>
+          <TouchableOpacity
+            style={styles.deleteAllButton}
+            onPress={handleDeleteAll}
+          >
+            <Text style={styles.deleteAllButtonText}>
+              🗑️ Delete All ({cards.length} cards)
+            </Text>
+          </TouchableOpacity>
+          <Text style={styles.deleteAllWarning}>
+            Use this to reset and troubleshoot import issues
+          </Text>
+        </View>
+      )}
 
       {/* Add Card Form */}
       {showAddCard && (
@@ -722,6 +765,34 @@ const styles = StyleSheet.create({
     color: '#666',
     fontStyle: 'italic',
     lineHeight: 18,
+  },
+  headerButtons: {
+    flexDirection: 'row',
+    gap: 10,
+  },
+  deleteAllContainer: {
+    backgroundColor: '#fef2f2',
+    padding: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: '#fecaca',
+  },
+  deleteAllButton: {
+    backgroundColor: '#ef4444',
+    padding: 12,
+    borderRadius: 6,
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  deleteAllButtonText: {
+    color: '#fff',
+    fontSize: 15,
+    fontWeight: '600',
+  },
+  deleteAllWarning: {
+    fontSize: 11,
+    color: '#991b1b',
+    textAlign: 'center',
+    fontStyle: 'italic',
   },
 });
 

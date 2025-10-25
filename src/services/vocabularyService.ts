@@ -120,6 +120,29 @@ export const deleteVocabularyCard = async (cardId: string): Promise<void> => {
 };
 
 /**
+ * Delete all vocabulary cards (use with caution!)
+ */
+export const deleteAllVocabularyCards = async (): Promise<number> => {
+  try {
+    console.log('🗑️ Starting mass delete of all vocabulary cards...');
+    const cardsSnapshot = await getDocs(collection(db, 'vocabularyCards'));
+
+    const deletePromises = cardsSnapshot.docs.map(doc =>
+      deleteDoc(doc.ref)
+    );
+
+    await Promise.all(deletePromises);
+    const deletedCount = cardsSnapshot.size;
+
+    console.log(`✅ Deleted ${deletedCount} vocabulary cards`);
+    return deletedCount;
+  } catch (error: any) {
+    console.error('❌ Failed to delete all cards:', error);
+    throw new Error(`Failed to delete all vocabulary cards: ${error.message}`);
+  }
+};
+
+/**
  * Get user's progress for a specific card
  */
 export const getUserCardProgress = async (
@@ -373,6 +396,7 @@ export const parseExcelFile = async (
         const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
 
         console.log(`📊 Detected ${jsonData.length - 1} rows in Excel file`);
+        console.log('📋 First few rows (raw data):', jsonData.slice(0, 3));
 
         // Parse rows (skip header row)
         const cards: Omit<VocabularyCard, 'id' | 'createdAt' | 'createdBy'>[] = [];
@@ -381,7 +405,18 @@ export const parseExcelFile = async (
           const row = jsonData[i] as any[];
 
           // Skip empty rows
-          if (!row || !row[0] || !row[1]) continue;
+          if (!row || !row[0] || !row[1]) {
+            console.log(`⏭️ Skipping empty row ${i + 1}`);
+            continue;
+          }
+
+          console.log(`\n📝 Row ${i + 1}:`, row);
+          console.log(`  Column count: ${row.length}`);
+          console.log(`  A (Word): "${row[0]}"`);
+          console.log(`  B (Definition): "${row[1]}"`);
+          if (row[2]) console.log(`  C (Example 1): "${row[2]}"`);
+          if (row[3]) console.log(`  D (Example 2): "${row[3]}"`);
+          if (row[4]) console.log(`  E (Difficulty): "${row[4]}"`);
 
           const word = String(row[0]).trim();
           const definition = String(row[1]).trim();
