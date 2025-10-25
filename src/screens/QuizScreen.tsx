@@ -85,7 +85,14 @@ const QuizScreen: React.FC<QuizScreenProps> = ({ navigation }) => {
 
   const handleAnswerSelect = (answer: string) => {
     console.log('✅ Answer selected:', answer);
+    console.log('Previous selectedAnswer:', selectedAnswer);
     setSelectedAnswer(answer);
+    console.log('setSelectedAnswer called with:', answer);
+
+    // Force a visual alert to confirm click is working
+    setTimeout(() => {
+      console.log('After state update, selectedAnswer should be:', answer);
+    }, 100);
   };
 
   const handleNext = async () => {
@@ -222,6 +229,22 @@ const QuizScreen: React.FC<QuizScreenProps> = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <View style={styles.content}>
+        {/* Debug Panel */}
+        <View style={styles.debugPanel}>
+          <Text style={styles.debugText}>
+            DEBUG: Selected Answer = "{selectedAnswer || 'NONE'}"
+          </Text>
+          <Text style={styles.debugText}>
+            Question {currentQuestionIndex + 1}/{questions.length}
+          </Text>
+          <Text style={styles.debugText}>
+            Options count: {currentQuestion.options.length}
+          </Text>
+          <Text style={styles.debugText}>
+            Correct answer: "{currentQuestion.correctAnswer}"
+          </Text>
+        </View>
+
         {/* Progress */}
         <View style={styles.progressContainer}>
           <Text style={styles.progressText}>
@@ -284,6 +307,19 @@ const QuizScreen: React.FC<QuizScreenProps> = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
+  debugPanel: {
+    backgroundColor: '#fff3cd',
+    padding: 10,
+    borderRadius: 4,
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: '#ffc107',
+  },
+  debugText: {
+    fontSize: 12,
+    color: '#856404',
+    fontFamily: 'monospace',
+  },
   container: {
     flex: 1,
     backgroundColor: '#f5f5f5',
