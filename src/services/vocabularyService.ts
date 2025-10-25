@@ -334,11 +334,20 @@ export const bulkImportVocabularyCards = async (
 
 /**
  * Parse Excel file and return vocabulary cards
- * Expected Excel format:
+ * Supports two formats:
+ *
+ * Format 1 (4 columns):
  * Column A: Word (front)
  * Column B: Definition (back)
  * Column C: Example (optional)
  * Column D: Difficulty (1-5, optional)
+ *
+ * Format 2 (5 columns - for regular + slang examples):
+ * Column A: Word (front)
+ * Column B: Definition (back)
+ * Column C: Example (Regular) (optional)
+ * Column D: Example (High School Slang) (optional)
+ * Column E: Difficulty (1-5, optional)
  */
 export const parseExcelFile = async (
   file: File,
@@ -364,6 +373,8 @@ export const parseExcelFile = async (
         // Convert to JSON
         const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
 
+        console.log(`📊 Detected ${jsonData.length - 1} rows in Excel file`);
+
         // Parse rows (skip header row)
         const cards: Omit<VocabularyCard, 'id' | 'createdAt' | 'createdBy'>[] = [];
 
@@ -375,8 +386,35 @@ export const parseExcelFile = async (
 
           const word = String(row[0]).trim();
           const definition = String(row[1]).trim();
-          const example = row[2] ? String(row[2]).trim() : undefined;
-          const difficulty = row[3] ? Math.min(5, Math.max(1, Number(row[3]))) : 1;
+
+          // Detect format based on number of columns
+          let example: string | undefined;
+          let difficulty: number = 1;
+
+          // Check if this is the 5-column format (with regular + slang examples)
+          if (row.length >= 5) {
+            // Format 2: Columns C + D are examples, E is difficulty
+            const regularExample = row[2] ? String(row[2]).trim() : '';
+            const slangExample = row[3] ? String(row[3]).trim() : '';
+
+            // Combine examples with labels
+            const examples: string[] = [];
+            if (regularExample) {
+              examples.push(`Regular: ${regularExample}`);
+            }
+            if (slangExample) {
+              examples.push(`Slang: ${slangExample}`);
+            }
+
+            example = examples.length > 0 ? examples.join('\n') : undefined;
+            difficulty = row[4] ? Math.min(5, Math.max(1, Number(row[4]))) : 1;
+
+            console.log(`📝 Row ${i}: ${word} | Examples: ${examples.length}`);
+          } else {
+            // Format 1: Column C is example, D is difficulty
+            example = row[2] ? String(row[2]).trim() : undefined;
+            difficulty = row[3] ? Math.min(5, Math.max(1, Number(row[3]))) : 1;
+          }
 
           if (word && definition) {
             cards.push({
@@ -389,7 +427,14 @@ export const parseExcelFile = async (
           }
         }
 
-        console.log(`📊 Parsed ${cards.length} vocabulary cards from Excel`);
+        console.log(`✅ Successfully parsed ${cards.length} vocabulary cards from Excel`);
+        if (cards.length > 0) {
+          console.log(`📋 Sample card:`, {
+            word: cards[0].front,
+            hasExample: !!cards[0].example,
+            exampleLength: cards[0].example?.length,
+          });
+        }
         resolve(cards);
       } catch (error: any) {
         console.error('❌ Excel parsing error:', error);
