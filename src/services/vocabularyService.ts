@@ -431,16 +431,16 @@ export const parseExcelFile = async (
             const regularExample = row[2] ? String(row[2]).trim() : '';
             const slangExample = row[3] ? String(row[3]).trim() : '';
 
-            // Combine examples with labels
+            // Combine examples with cool labels
             const examples: string[] = [];
             if (regularExample) {
-              examples.push(`Regular: ${regularExample}`);
+              examples.push(`📖 ${regularExample}`);
             }
             if (slangExample) {
-              examples.push(`Slang: ${slangExample}`);
+              examples.push(`💬 ${slangExample}`);
             }
 
-            example = examples.length > 0 ? examples.join('\n') : undefined;
+            example = examples.length > 0 ? examples.join('\n\n') : undefined;
             difficulty = row[4] ? Math.min(5, Math.max(1, Number(row[4]))) : 1;
 
             console.log(`📝 Row ${i}: ${word} | Examples: ${examples.length}`);
