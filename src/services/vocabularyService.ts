@@ -15,6 +15,7 @@ import {
 } from 'firebase/firestore';
 import { db } from './firebase';
 import { VocabularyCard, UserVocabularyProgress, VocabularyLevel } from '../types';
+import * as XLSX from 'xlsx';
 
 /**
  * Create a new vocabulary card
@@ -356,16 +357,14 @@ export const parseExcelFile = async (
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
 
-    reader.onload = async (e) => {
+    reader.onload = (e) => {
       try {
         const data = e.target?.result;
         if (!data) {
           throw new Error('Failed to read file');
         }
 
-        // Dynamic import to reduce bundle size
-        const XLSX = await import('xlsx');
-
+        console.log('📂 Reading Excel file...');
         const workbook = XLSX.read(data, { type: 'binary' });
         const sheetName = workbook.SheetNames[0];
         const worksheet = workbook.Sheets[sheetName];
