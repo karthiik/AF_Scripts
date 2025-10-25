@@ -287,3 +287,27 @@ export const getTotalPaidAmount = async (userId: string): Promise<number> => {
     return 0;
   }
 };
+
+/**
+ * Delete all rewards earned by a specific user (admin only)
+ */
+export const deleteAllUserRewards = async (userId: string): Promise<number> => {
+  try {
+    console.log(`🗑️ Deleting all rewards for user: ${userId}`);
+    const q = query(
+      collection(db, 'rewardsEarned'),
+      where('userId', '==', userId)
+    );
+
+    const rewardsSnapshot = await getDocs(q);
+    const deletePromises = rewardsSnapshot.docs.map(doc => deleteDoc(doc.ref));
+    await Promise.all(deletePromises);
+
+    const deletedCount = rewardsSnapshot.size;
+    console.log(`✅ Deleted ${deletedCount} reward records`);
+    return deletedCount;
+  } catch (error: any) {
+    console.error('❌ Failed to delete user rewards:', error);
+    throw new Error(`Failed to delete user rewards: ${error.message}`);
+  }
+};

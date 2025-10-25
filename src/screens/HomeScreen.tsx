@@ -130,7 +130,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
           <Text style={styles.quizButtonSubtext}>
             {completedToday
               ? 'Come back tomorrow for your next quiz'
-              : '3 vocabulary cards waiting for you'}
+              : '5 vocabulary cards waiting for you'}
           </Text>
         </TouchableOpacity>
 

@@ -18,8 +18,12 @@ import {
   deleteRewardRule,
   getUnpaidRewards,
   markRewardAsPaid,
+  deleteAllUserRewards,
 } from '../services/rewardService';
 import { getLinkedUser } from '../services/authService';
+import { deleteAllQuizAttempts } from '../services/quizService';
+import { deleteAllUserProgress } from '../services/vocabularyService';
+import { deleteUserStreak } from '../services/streakService';
 
 type AdminPanelScreenProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'AdminPanel'>;
@@ -139,6 +143,47 @@ const AdminPanelScreen: React.FC<AdminPanelScreenProps> = ({ navigation }) => {
     }
   };
 
+  const handleResetUserStats = async () => {
+    if (!linkedUser) {
+      alert('No linked user to reset stats for');
+      return;
+    }
+
+    const confirmed = confirm(
+      `⚠️ WARNING: Reset ALL stats and rewards for ${linkedUser.displayName}?\n\nThis will delete:\n• All quiz attempts\n• All vocabulary progress\n• All earned rewards\n• Current streak\n\nThis action CANNOT be undone!\n\nType 'RESET' to confirm.`
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const [quizCount, progressCount, rewardsCount, streakCount] = await Promise.all([
+        deleteAllQuizAttempts(linkedUser.id),
+        deleteAllUserProgress(linkedUser.id),
+        deleteAllUserRewards(linkedUser.id),
+        deleteUserStreak(linkedUser.id),
+      ]);
+
+      await loadAdminData();
+
+      alert(
+        `✅ Successfully reset stats for ${linkedUser.displayName}!\n\n` +
+        `Deleted:\n` +
+        `• ${quizCount} quiz attempts\n` +
+        `• ${progressCount} progress records\n` +
+        `• ${rewardsCount} rewards\n` +
+        `• ${streakCount} streak record(s)`
+      );
+    } catch (error: any) {
+      console.error('❌ Reset stats error:', error);
+      alert(`Failed to reset stats: ${error.message}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
@@ -154,10 +199,27 @@ const AdminPanelScreen: React.FC<AdminPanelScreenProps> = ({ navigation }) => {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Linked Account</Text>
           {linkedUser ? (
-            <View style={styles.linkedUserCard}>
-              <Text style={styles.linkedUserName}>{linkedUser.displayName}</Text>
-              <Text style={styles.linkedUserEmail}>{linkedUser.email}</Text>
-            </View>
+            <>
+              <View style={styles.linkedUserCard}>
+                <Text style={styles.linkedUserName}>{linkedUser.displayName}</Text>
+                <Text style={styles.linkedUserEmail}>{linkedUser.email}</Text>
+              </View>
+
+              {/* Reset Stats Button */}
+              <View style={styles.resetContainer}>
+                <TouchableOpacity
+                  style={styles.resetButton}
+                  onPress={handleResetUserStats}
+                >
+                  <Text style={styles.resetButtonText}>
+                    🔄 Reset All Stats & Rewards
+                  </Text>
+                </TouchableOpacity>
+                <Text style={styles.resetWarning}>
+                  Deletes all quiz attempts, progress, rewards, and streaks
+                </Text>
+              </View>
+            </>
           ) : (
             <Text style={styles.noDataText}>
               No linked account. Ask your son to share their user ID to link accounts.
@@ -554,6 +616,32 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#dc2626',
     fontWeight: '600',
+  },
+  resetContainer: {
+    backgroundColor: '#fef2f2',
+    padding: 15,
+    borderRadius: 8,
+    marginTop: 15,
+    borderWidth: 1,
+    borderColor: '#fecaca',
+  },
+  resetButton: {
+    backgroundColor: '#f97316',
+    padding: 12,
+    borderRadius: 6,
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  resetButtonText: {
+    color: '#fff',
+    fontSize: 15,
+    fontWeight: '600',
+  },
+  resetWarning: {
+    fontSize: 11,
+    color: '#991b1b',
+    textAlign: 'center',
+    fontStyle: 'italic',
   },
 });
 

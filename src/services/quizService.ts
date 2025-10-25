@@ -264,3 +264,27 @@ export const getQuizHistory = async (
     return [];
   }
 };
+
+/**
+ * Delete all quiz attempts for a specific user (admin only)
+ */
+export const deleteAllQuizAttempts = async (userId: string): Promise<number> => {
+  try {
+    console.log(`🗑️ Deleting all quiz attempts for user: ${userId}`);
+    const q = query(
+      collection(db, 'quizAttempts'),
+      where('userId', '==', userId)
+    );
+
+    const attemptsSnapshot = await getDocs(q);
+    const deletePromises = attemptsSnapshot.docs.map(doc => deleteDoc(doc.ref));
+    await Promise.all(deletePromises);
+
+    const deletedCount = attemptsSnapshot.size;
+    console.log(`✅ Deleted ${deletedCount} quiz attempts`);
+    return deletedCount;
+  } catch (error: any) {
+    console.error('❌ Failed to delete quiz attempts:', error);
+    throw new Error(`Failed to delete quiz attempts: ${error.message}`);
+  }
+};

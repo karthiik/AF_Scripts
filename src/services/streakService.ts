@@ -178,3 +178,27 @@ export const getLongestStreak = async (userId: string): Promise<number> => {
     return 0;
   }
 };
+
+/**
+ * Delete streak for a specific user (admin only)
+ */
+export const deleteUserStreak = async (userId: string): Promise<number> => {
+  try {
+    console.log(`🗑️ Deleting streak for user: ${userId}`);
+    const q = query(
+      collection(db, 'streaks'),
+      where('userId', '==', userId)
+    );
+
+    const streakSnapshot = await getDocs(q);
+    const deletePromises = streakSnapshot.docs.map(doc => deleteDoc(doc.ref));
+    await Promise.all(deletePromises);
+
+    const deletedCount = streakSnapshot.size;
+    console.log(`✅ Deleted ${deletedCount} streak records`);
+    return deletedCount;
+  } catch (error: any) {
+    console.error('❌ Failed to delete user streak:', error);
+    throw new Error(`Failed to delete user streak: ${error.message}`);
+  }
+};

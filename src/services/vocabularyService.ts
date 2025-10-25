@@ -279,9 +279,9 @@ export const getDailyQuizCards = async (userId: string): Promise<VocabularyCard[
       quizCards = [...unmasteredCards, ...masteredCards];
     }
 
-    // Shuffle and take 3 cards
+    // Shuffle and take 5 cards
     const shuffled = quizCards.sort(() => Math.random() - 0.5);
-    return shuffled.slice(0, Math.min(3, shuffled.length));
+    return shuffled.slice(0, Math.min(5, shuffled.length));
   } catch (error: any) {
     throw new Error(`Failed to get daily quiz cards: ${error.message}`);
   }
@@ -482,4 +482,28 @@ export const parseExcelFile = async (
 
     reader.readAsBinaryString(file);
   });
+};
+
+/**
+ * Delete all vocabulary progress for a specific user (admin only)
+ */
+export const deleteAllUserProgress = async (userId: string): Promise<number> => {
+  try {
+    console.log(`🗑️ Deleting all vocabulary progress for user: ${userId}`);
+    const q = query(
+      collection(db, 'userVocabularyProgress'),
+      where('userId', '==', userId)
+    );
+
+    const progressSnapshot = await getDocs(q);
+    const deletePromises = progressSnapshot.docs.map(doc => deleteDoc(doc.ref));
+    await Promise.all(deletePromises);
+
+    const deletedCount = progressSnapshot.size;
+    console.log(`✅ Deleted ${deletedCount} progress records`);
+    return deletedCount;
+  } catch (error: any) {
+    console.error('❌ Failed to delete user progress:', error);
+    throw new Error(`Failed to delete user progress: ${error.message}`);
+  }
 };

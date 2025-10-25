@@ -136,7 +136,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
           <View style={styles.statCard}>
             <Text style={styles.statValue}>
               {stats.totalQuizzes > 0
-                ? Math.round((stats.totalScore / (stats.totalQuizzes * 30)) * 100)
+                ? Math.round((stats.totalScore / (stats.totalQuizzes * 50)) * 100)
                 : 0}
               %
             </Text>
