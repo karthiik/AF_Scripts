@@ -85,5 +85,13 @@ service cloud.firestore {
                     );
       allow delete: if false; // Don't allow deletion of reward history
     }
+
+    // Settings - parents can read/write their own settings
+    match /settings/{parentId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && request.auth.uid == parentId;
+      allow update: if isAuthenticated() && request.auth.uid == parentId;
+      allow delete: if false; // Don't allow deletion of settings
+    }
   }
 }

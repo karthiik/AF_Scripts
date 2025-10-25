@@ -24,6 +24,7 @@ import { getLinkedUser } from '../services/authService';
 import { deleteAllQuizAttempts } from '../services/quizService';
 import { deleteAllUserProgress } from '../services/vocabularyService';
 import { deleteUserStreak } from '../services/streakService';
+import { getSettings, updateSettings } from '../services/settingsService';
 
 type AdminPanelScreenProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'AdminPanel'>;
@@ -36,6 +37,7 @@ const AdminPanelScreen: React.FC<AdminPanelScreenProps> = ({ navigation }) => {
   const [linkedUser, setLinkedUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [showAddReward, setShowAddReward] = useState(false);
+  const [enforceOncePerDay, setEnforceOncePerDay] = useState(true);
 
   // New reward form
   const [newRewardTitle, setNewRewardTitle] = useState('');
@@ -59,13 +61,15 @@ const AdminPanelScreen: React.FC<AdminPanelScreenProps> = ({ navigation }) => {
 
     setLoading(true);
     try {
-      const [rules, linked] = await Promise.all([
+      const [rules, linked, settings] = await Promise.all([
         getRewardRules(user.id),
         getLinkedUser(user.id),
+        getSettings(user.id),
       ]);
 
       setRewardRules(rules);
       setLinkedUser(linked);
+      setEnforceOncePerDay(settings?.enforceOncePerDay ?? true);
 
       if (linked) {
         const rewards = await getUnpaidRewards(linked.id);
@@ -138,6 +142,23 @@ const AdminPanelScreen: React.FC<AdminPanelScreenProps> = ({ navigation }) => {
       await markRewardAsPaid(rewardId);
       await loadAdminData();
       alert('Reward marked as paid!');
+    } catch (error: any) {
+      alert(`Error: ${error.message}`);
+    }
+  };
+
+  const handleToggleOncePerDay = async () => {
+    if (!user) return;
+
+    try {
+      const newValue = !enforceOncePerDay;
+      await updateSettings(user.id, { enforceOncePerDay: newValue });
+      setEnforceOncePerDay(newValue);
+      alert(
+        newValue
+          ? '✅ Quiz restriction enabled: 1 quiz per day'
+          : '✅ Quiz restriction disabled: Unlimited quizzes'
+      );
     } catch (error: any) {
       alert(`Error: ${error.message}`);
     }
@@ -234,6 +255,37 @@ const AdminPanelScreen: React.FC<AdminPanelScreenProps> = ({ navigation }) => {
         >
           <Text style={styles.manageVocabButtonText}>Manage Vocabulary</Text>
         </TouchableOpacity>
+
+        {/* Quiz Settings */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Quiz Settings</Text>
+          <View style={styles.settingCard}>
+            <View style={styles.settingInfo}>
+              <Text style={styles.settingLabel}>1 Quiz Per Day Restriction</Text>
+              <Text style={styles.settingDescription}>
+                {enforceOncePerDay
+                  ? 'Enabled: Users can only take quiz once per day'
+                  : 'Disabled: Users can take unlimited quizzes (for practice)'}
+              </Text>
+            </View>
+            <TouchableOpacity
+              style={[
+                styles.toggleButton,
+                enforceOncePerDay && styles.toggleButtonActive,
+              ]}
+              onPress={handleToggleOncePerDay}
+            >
+              <Text
+                style={[
+                  styles.toggleButtonText,
+                  enforceOncePerDay && styles.toggleButtonTextActive,
+                ]}
+              >
+                {enforceOncePerDay ? 'ON' : 'OFF'}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
 
         {/* Unpaid Rewards */}
         {linkedUser && unpaidRewards.length > 0 && (
@@ -642,6 +694,28 @@ const styles = StyleSheet.create({
     color: '#991b1b',
     textAlign: 'center',
     fontStyle: 'italic',
+  },
+  settingCard: {
+    backgroundColor: '#fff',
+    padding: 15,
+    borderRadius: 8,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  settingInfo: {
+    flex: 1,
+    marginRight: 15,
+  },
+  settingLabel: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 4,
+  },
+  settingDescription: {
+    fontSize: 13,
+    color: '#666',
   },
 });
 

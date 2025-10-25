@@ -13,6 +13,8 @@ import { useAuth } from '../contexts/AuthContext';
 import { getCurrentStreak, getLongestStreak } from '../services/streakService';
 import { getDailyScore, hasCompletedTodayQuiz } from '../services/quizService';
 import { getTotalUnpaidAmount } from '../services/rewardService';
+import { getLinkedUser } from '../services/authService';
+import { isOncePerDayEnforced } from '../services/settingsService';
 
 type HomeScreenProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'Home'>;
@@ -26,6 +28,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   const [completedToday, setCompletedToday] = useState(false);
   const [unpaidRewards, setUnpaidRewards] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [quizRestricted, setQuizRestricted] = useState(false);
 
   useEffect(() => {
     loadDashboardData();
@@ -36,12 +39,19 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 
     setLoading(true);
     try {
-      const [streak, longest, score, completed, rewards] = await Promise.all([
+      // Get linked parent to check settings
+      const linkedParent = user.role === UserRole.SON
+        ? await getLinkedUser(user.id)
+        : null;
+      const parentId = user.role === UserRole.PARENT ? user.id : linkedParent?.id;
+
+      const [streak, longest, score, completed, rewards, enforced] = await Promise.all([
         getCurrentStreak(user.id),
         getLongestStreak(user.id),
         getDailyScore(user.id),
         hasCompletedTodayQuiz(user.id),
         getTotalUnpaidAmount(user.id),
+        parentId ? isOncePerDayEnforced(parentId) : Promise.resolve(true),
       ]);
 
       setCurrentStreak(streak);
@@ -49,6 +59,9 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
       setDailyScore(score);
       setCompletedToday(completed);
       setUnpaidRewards(rewards);
+
+      // Only restrict if both completed today AND restriction is enforced
+      setQuizRestricted(completed && enforced);
     } catch (error) {
       console.error('Error loading dashboard data:', error);
     } finally {
@@ -119,16 +132,16 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         <TouchableOpacity
           style={[
             styles.quizButton,
-            completedToday && styles.quizButtonCompleted,
+            quizRestricted && styles.quizButtonCompleted,
           ]}
           onPress={() => navigation.navigate('Quiz')}
-          disabled={completedToday}
+          disabled={quizRestricted}
         >
           <Text style={styles.quizButtonTitle}>
-            {completedToday ? '✓ Quiz Completed!' : 'Start Daily Quiz'}
+            {quizRestricted ? '✓ Quiz Completed!' : 'Start Daily Quiz'}
           </Text>
           <Text style={styles.quizButtonSubtext}>
-            {completedToday
+            {quizRestricted
               ? 'Come back tomorrow for your next quiz'
               : '5 vocabulary cards waiting for you'}
           </Text>
