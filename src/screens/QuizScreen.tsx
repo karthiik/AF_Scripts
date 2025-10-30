@@ -77,15 +77,21 @@ const QuizScreen: React.FC<QuizScreenProps> = ({ navigation }) => {
   };
 
   const handleAnswerSelect = (answer: string) => {
-    if (isAnswered && isCorrect) return; // Don't allow changing after correct answer
+    if (isCorrect) return; // Don't allow changing after correct answer
+
     setSelectedAnswer(answer);
+
+    // If we're already showing a hint (wrong answer), automatically check the new answer
+    if (isAnswered) {
+      checkAnswer(answer);
+    }
   };
 
-  const handleCheckAnswer = async () => {
-    if (!selectedAnswer || !user) return;
+  const checkAnswer = async (answer: string) => {
+    if (!answer || !user) return;
 
     const currentQuestion = questions[currentQuestionIndex];
-    const correct = selectedAnswer === currentQuestion.correctAnswer;
+    const correct = answer === currentQuestion.correctAnswer;
 
     setIsAnswered(true);
     setIsCorrect(correct);
@@ -101,7 +107,7 @@ const QuizScreen: React.FC<QuizScreenProps> = ({ navigation }) => {
         ...answers,
         {
           cardId: currentQuestion.card.id,
-          userAnswer: selectedAnswer,
+          userAnswer: answer,
           correctAnswer: currentQuestion.correctAnswer,
           isCorrect: true,
           timeSpent,
@@ -109,6 +115,11 @@ const QuizScreen: React.FC<QuizScreenProps> = ({ navigation }) => {
       ];
       setAnswers(newAnswers);
     }
+  };
+
+  const handleCheckAnswer = async () => {
+    if (!selectedAnswer) return;
+    await checkAnswer(selectedAnswer);
   };
 
   const handleContinue = async () => {
@@ -124,11 +135,6 @@ const QuizScreen: React.FC<QuizScreenProps> = ({ navigation }) => {
       // Finish quiz
       await finishQuiz(answers);
     }
-  };
-
-  const handleTryAgain = () => {
-    setSelectedAnswer(null);
-    setIsAnswered(false);
   };
 
   const finishQuiz = async (finalAnswers: any[]) => {
@@ -317,14 +323,7 @@ const QuizScreen: React.FC<QuizScreenProps> = ({ navigation }) => {
               {currentQuestionIndex < questions.length - 1 ? 'Continue →' : 'Finish Quiz'}
             </Text>
           </TouchableOpacity>
-        ) : (
-          <TouchableOpacity
-            style={styles.tryAgainButton}
-            onPress={handleTryAgain}
-          >
-            <Text style={styles.tryAgainButtonText}>Try Again</Text>
-          </TouchableOpacity>
-        )}
+        ) : null}
       </View>
     </ScrollView>
   );
@@ -487,17 +486,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#a5a7f7',
   },
   actionButtonText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  tryAgainButton: {
-    backgroundColor: '#f97316',
-    padding: 18,
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-  tryAgainButtonText: {
     color: '#fff',
     fontSize: 18,
     fontWeight: 'bold',
