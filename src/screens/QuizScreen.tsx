@@ -76,15 +76,13 @@ const QuizScreen: React.FC<QuizScreenProps> = ({ navigation }) => {
     }
   };
 
-  const handleAnswerSelect = (answer: string) => {
+  const handleAnswerSelect = async (answer: string) => {
     if (isCorrect) return; // Don't allow changing after correct answer
 
     setSelectedAnswer(answer);
 
-    // If we're already showing a hint (wrong answer), automatically check the new answer
-    if (isAnswered) {
-      checkAnswer(answer);
-    }
+    // Automatically check the answer immediately
+    await checkAnswer(answer);
   };
 
   const checkAnswer = async (answer: string) => {
@@ -115,11 +113,6 @@ const QuizScreen: React.FC<QuizScreenProps> = ({ navigation }) => {
       ];
       setAnswers(newAnswers);
     }
-  };
-
-  const handleCheckAnswer = async () => {
-    if (!selectedAnswer) return;
-    await checkAnswer(selectedAnswer);
   };
 
   const handleContinue = async () => {
@@ -305,16 +298,8 @@ const QuizScreen: React.FC<QuizScreenProps> = ({ navigation }) => {
           </View>
         )}
 
-        {/* Action Button */}
-        {!isAnswered ? (
-          <TouchableOpacity
-            style={[styles.actionButton, !selectedAnswer && styles.actionButtonDisabled]}
-            onPress={handleCheckAnswer}
-            disabled={!selectedAnswer}
-          >
-            <Text style={styles.actionButtonText}>Check Answer</Text>
-          </TouchableOpacity>
-        ) : isCorrect ? (
+        {/* Continue Button - Only show when correct */}
+        {isCorrect && (
           <TouchableOpacity
             style={styles.actionButton}
             onPress={handleContinue}
@@ -323,7 +308,7 @@ const QuizScreen: React.FC<QuizScreenProps> = ({ navigation }) => {
               {currentQuestionIndex < questions.length - 1 ? 'Continue →' : 'Finish Quiz'}
             </Text>
           </TouchableOpacity>
-        ) : null}
+        )}
       </View>
     </ScrollView>
   );
