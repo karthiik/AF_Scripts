@@ -11,6 +11,7 @@ import {
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList, RewardRule, RewardEarned, UserRole } from '../types';
 import { useAuth } from '../contexts/AuthContext';
+import { RobloxTheme, Typography, Spacing, BorderRadius } from '../theme/colors';
 import {
   getRewardRules,
   createRewardRule,
@@ -208,7 +209,7 @@ const AdminPanelScreen: React.FC<AdminPanelScreenProps> = ({ navigation }) => {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#6366f1" />
+        <ActivityIndicator size="large" color={RobloxTheme.primary} />
       </View>
     );
   }
@@ -326,6 +327,7 @@ const AdminPanelScreen: React.FC<AdminPanelScreenProps> = ({ navigation }) => {
               <TextInput
                 style={styles.input}
                 placeholder="Title (e.g., Week Warrior)"
+                placeholderTextColor={RobloxTheme.textTertiary}
                 value={newRewardTitle}
                 onChangeText={setNewRewardTitle}
               />
@@ -333,6 +335,7 @@ const AdminPanelScreen: React.FC<AdminPanelScreenProps> = ({ navigation }) => {
               <TextInput
                 style={styles.input}
                 placeholder="Description"
+                placeholderTextColor={RobloxTheme.textTertiary}
                 value={newRewardDescription}
                 onChangeText={setNewRewardDescription}
               />
@@ -369,6 +372,7 @@ const AdminPanelScreen: React.FC<AdminPanelScreenProps> = ({ navigation }) => {
                     ? '10 words'
                     : '100 points'
                 })`}
+                placeholderTextColor={RobloxTheme.textTertiary}
                 value={newRewardTarget}
                 onChangeText={setNewRewardTarget}
                 keyboardType="numeric"
@@ -377,6 +381,7 @@ const AdminPanelScreen: React.FC<AdminPanelScreenProps> = ({ navigation }) => {
               <TextInput
                 style={styles.input}
                 placeholder="Amount ($)"
+                placeholderTextColor={RobloxTheme.textTertiary}
                 value={newRewardAmount}
                 onChangeText={setNewRewardAmount}
                 keyboardType="decimal-pad"
@@ -449,73 +454,74 @@ const AdminPanelScreen: React.FC<AdminPanelScreenProps> = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: RobloxTheme.background,
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f5f5f5',
+    backgroundColor: RobloxTheme.background,
   },
   content: {
-    padding: 20,
+    padding: Spacing.lg,
   },
   section: {
-    marginBottom: 30,
+    marginBottom: Spacing.xl,
   },
   sectionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 15,
+    marginBottom: Spacing.md,
   },
   sectionTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#333',
+    fontSize: Typography.h4.fontSize,
+    fontWeight: Typography.h4.fontWeight,
+    color: RobloxTheme.textPrimary,
   },
   addButton: {
-    fontSize: 16,
-    color: '#6366f1',
+    fontSize: Typography.body.fontSize,
+    color: RobloxTheme.primary,
     fontWeight: '600',
   },
   linkedUserCard: {
-    backgroundColor: '#fff',
-    padding: 15,
-    borderRadius: 8,
+    backgroundColor: RobloxTheme.backgroundElevated,
+    padding: Spacing.md,
+    borderRadius: BorderRadius.sm,
   },
   linkedUserName: {
-    fontSize: 18,
+    fontSize: Typography.bodyLarge.fontSize,
     fontWeight: '600',
-    color: '#333',
+    color: RobloxTheme.textPrimary,
   },
   linkedUserEmail: {
-    fontSize: 14,
-    color: '#666',
+    fontSize: Typography.bodySmall.fontSize,
+    color: RobloxTheme.textSecondary,
     marginTop: 4,
   },
   noDataText: {
-    fontSize: 14,
-    color: '#666',
+    fontSize: Typography.bodySmall.fontSize,
+    color: RobloxTheme.textSecondary,
     fontStyle: 'italic',
   },
   manageVocabButton: {
-    backgroundColor: '#6366f1',
-    padding: 15,
-    borderRadius: 8,
+    backgroundColor: RobloxTheme.primary,
+    padding: Spacing.md,
+    borderRadius: BorderRadius.sm,
     alignItems: 'center',
-    marginBottom: 30,
+    marginBottom: Spacing.xl,
+    shadowColor: RobloxTheme.shadow,
   },
   manageVocabButtonText: {
-    color: '#fff',
-    fontSize: 16,
+    color: RobloxTheme.textPrimary,
+    fontSize: Typography.body.fontSize,
     fontWeight: '600',
   },
   rewardCard: {
-    backgroundColor: '#fff',
-    padding: 15,
-    borderRadius: 8,
-    marginBottom: 10,
+    backgroundColor: RobloxTheme.backgroundElevated,
+    padding: Spacing.md,
+    borderRadius: BorderRadius.sm,
+    marginBottom: Spacing.sm,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -524,198 +530,202 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   rewardAmount: {
-    fontSize: 20,
+    fontSize: Typography.h4.fontSize,
     fontWeight: 'bold',
-    color: '#6366f1',
+    color: RobloxTheme.primary,
   },
   rewardDate: {
-    fontSize: 12,
-    color: '#666',
+    fontSize: Typography.labelSmall.fontSize,
+    color: RobloxTheme.textSecondary,
     marginTop: 4,
   },
   markPaidButton: {
-    backgroundColor: '#22c55e',
-    paddingHorizontal: 15,
-    paddingVertical: 8,
-    borderRadius: 6,
+    backgroundColor: RobloxTheme.success,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.sm,
+    borderRadius: BorderRadius.sm,
+    shadowColor: RobloxTheme.shadow,
   },
   markPaidButtonText: {
-    color: '#fff',
-    fontSize: 14,
+    color: RobloxTheme.textPrimary,
+    fontSize: Typography.label.fontSize,
     fontWeight: '600',
   },
   addRewardForm: {
-    backgroundColor: '#fff',
-    padding: 15,
-    borderRadius: 8,
-    marginBottom: 15,
+    backgroundColor: RobloxTheme.backgroundElevated,
+    padding: Spacing.md,
+    borderRadius: BorderRadius.sm,
+    marginBottom: Spacing.md,
   },
   input: {
-    backgroundColor: '#f9fafb',
-    padding: 12,
-    borderRadius: 6,
-    marginBottom: 10,
+    backgroundColor: RobloxTheme.backgroundHighlight,
+    color: RobloxTheme.textPrimary,
+    padding: Spacing.md / 1.33,
+    borderRadius: BorderRadius.sm,
+    marginBottom: Spacing.sm,
     borderWidth: 1,
-    borderColor: '#e5e7eb',
+    borderColor: RobloxTheme.border,
   },
   label: {
-    fontSize: 14,
-    color: '#666',
-    marginBottom: 8,
+    fontSize: Typography.label.fontSize,
+    color: RobloxTheme.textSecondary,
+    marginBottom: Spacing.sm,
   },
   typeContainer: {
     flexDirection: 'row',
-    gap: 8,
-    marginBottom: 10,
+    gap: Spacing.sm,
+    marginBottom: Spacing.sm,
   },
   typeButton: {
     flex: 1,
-    padding: 10,
-    borderRadius: 6,
+    padding: Spacing.sm,
+    borderRadius: BorderRadius.sm,
     borderWidth: 1,
-    borderColor: '#e5e7eb',
-    backgroundColor: '#fff',
+    borderColor: RobloxTheme.border,
+    backgroundColor: RobloxTheme.backgroundElevated,
     alignItems: 'center',
   },
   typeButtonActive: {
-    backgroundColor: '#6366f1',
-    borderColor: '#6366f1',
+    backgroundColor: RobloxTheme.primary,
+    borderColor: RobloxTheme.primary,
   },
   typeButtonText: {
-    fontSize: 13,
-    color: '#666',
+    fontSize: Typography.labelSmall.fontSize,
+    color: RobloxTheme.textSecondary,
   },
   typeButtonTextActive: {
-    color: '#fff',
+    color: RobloxTheme.textPrimary,
     fontWeight: '600',
   },
   createButton: {
-    backgroundColor: '#6366f1',
-    padding: 12,
-    borderRadius: 6,
+    backgroundColor: RobloxTheme.primary,
+    padding: Spacing.md / 1.33,
+    borderRadius: BorderRadius.sm,
     alignItems: 'center',
     marginTop: 5,
+    shadowColor: RobloxTheme.shadow,
   },
   createButtonText: {
-    color: '#fff',
-    fontSize: 15,
+    color: RobloxTheme.textPrimary,
+    fontSize: Typography.body.fontSize,
     fontWeight: '600',
   },
   ruleCard: {
-    backgroundColor: '#fff',
-    padding: 15,
-    borderRadius: 8,
-    marginBottom: 10,
+    backgroundColor: RobloxTheme.backgroundElevated,
+    padding: Spacing.md,
+    borderRadius: BorderRadius.sm,
+    marginBottom: Spacing.sm,
   },
   ruleHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: Spacing.sm,
   },
   ruleTitle: {
-    fontSize: 16,
+    fontSize: Typography.body.fontSize,
     fontWeight: 'bold',
-    color: '#333',
+    color: RobloxTheme.textPrimary,
   },
   ruleAmount: {
-    fontSize: 18,
+    fontSize: Typography.bodyLarge.fontSize,
     fontWeight: 'bold',
-    color: '#6366f1',
+    color: RobloxTheme.primary,
   },
   ruleDescription: {
-    fontSize: 14,
-    color: '#666',
+    fontSize: Typography.bodySmall.fontSize,
+    color: RobloxTheme.textSecondary,
     marginBottom: 6,
   },
   ruleCondition: {
-    fontSize: 13,
-    color: '#666',
-    marginBottom: 10,
+    fontSize: Typography.labelSmall.fontSize,
+    color: RobloxTheme.textSecondary,
+    marginBottom: Spacing.sm,
   },
   ruleActions: {
     flexDirection: 'row',
-    gap: 10,
+    gap: Spacing.sm,
   },
   toggleButton: {
     flex: 1,
-    padding: 10,
-    borderRadius: 6,
+    padding: Spacing.sm,
+    borderRadius: BorderRadius.sm,
     borderWidth: 1,
-    borderColor: '#e5e7eb',
+    borderColor: RobloxTheme.border,
     alignItems: 'center',
   },
   toggleButtonActive: {
-    backgroundColor: '#22c55e',
-    borderColor: '#22c55e',
+    backgroundColor: RobloxTheme.success,
+    borderColor: RobloxTheme.success,
   },
   toggleButtonText: {
-    fontSize: 14,
-    color: '#666',
+    fontSize: Typography.label.fontSize,
+    color: RobloxTheme.textSecondary,
   },
   toggleButtonTextActive: {
-    color: '#fff',
+    color: RobloxTheme.textPrimary,
     fontWeight: '600',
   },
   deleteButton: {
     flex: 1,
-    padding: 10,
-    borderRadius: 6,
-    backgroundColor: '#fee2e2',
+    padding: Spacing.sm,
+    borderRadius: BorderRadius.sm,
+    backgroundColor: RobloxTheme.errorBg,
     alignItems: 'center',
   },
   deleteButtonText: {
-    fontSize: 14,
-    color: '#dc2626',
+    fontSize: Typography.label.fontSize,
+    color: RobloxTheme.error,
     fontWeight: '600',
   },
   resetContainer: {
-    backgroundColor: '#fef2f2',
-    padding: 15,
-    borderRadius: 8,
-    marginTop: 15,
+    backgroundColor: RobloxTheme.errorBg,
+    padding: Spacing.md,
+    borderRadius: BorderRadius.sm,
+    marginTop: Spacing.md,
     borderWidth: 1,
-    borderColor: '#fecaca',
+    borderColor: RobloxTheme.errorBorder,
   },
   resetButton: {
-    backgroundColor: '#f97316',
-    padding: 12,
-    borderRadius: 6,
+    backgroundColor: RobloxTheme.warning,
+    padding: Spacing.md / 1.33,
+    borderRadius: BorderRadius.sm,
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: Spacing.sm,
+    shadowColor: RobloxTheme.shadow,
   },
   resetButtonText: {
-    color: '#fff',
-    fontSize: 15,
+    color: RobloxTheme.textPrimary,
+    fontSize: Typography.body.fontSize,
     fontWeight: '600',
   },
   resetWarning: {
     fontSize: 11,
-    color: '#991b1b',
+    color: RobloxTheme.error,
     textAlign: 'center',
     fontStyle: 'italic',
   },
   settingCard: {
-    backgroundColor: '#fff',
-    padding: 15,
-    borderRadius: 8,
+    backgroundColor: RobloxTheme.backgroundElevated,
+    padding: Spacing.md,
+    borderRadius: BorderRadius.sm,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
   },
   settingInfo: {
     flex: 1,
-    marginRight: 15,
+    marginRight: Spacing.md,
   },
   settingLabel: {
-    fontSize: 16,
+    fontSize: Typography.body.fontSize,
     fontWeight: '600',
-    color: '#333',
+    color: RobloxTheme.textPrimary,
     marginBottom: 4,
   },
   settingDescription: {
-    fontSize: 13,
-    color: '#666',
+    fontSize: Typography.labelSmall.fontSize,
+    color: RobloxTheme.textSecondary,
   },
 });
 

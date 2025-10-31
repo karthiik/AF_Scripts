@@ -16,6 +16,7 @@ import {
   getWeeklyLeaderboard,
   getStreakLeaderboard,
 } from '../services/leaderboardService';
+import { RobloxTheme, Typography, Spacing, BorderRadius } from '../theme/colors';
 
 type LeaderboardScreenProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'Leaderboard'>;
@@ -92,7 +93,7 @@ const LeaderboardScreen: React.FC<LeaderboardScreenProps> = ({ navigation }) => 
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#6366f1" />
+        <ActivityIndicator size="large" color={RobloxTheme.primary} />
       </View>
     );
   }
@@ -201,60 +202,59 @@ const LeaderboardScreen: React.FC<LeaderboardScreenProps> = ({ navigation }) => 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: RobloxTheme.background,
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f5f5f5',
+    backgroundColor: RobloxTheme.background,
   },
   tabsContainer: {
     flexDirection: 'row',
-    backgroundColor: '#fff',
+    backgroundColor: RobloxTheme.backgroundElevated,
     borderBottomWidth: 1,
-    borderBottomColor: '#e5e7eb',
+    borderBottomColor: RobloxTheme.border,
   },
   tab: {
     flex: 1,
-    paddingVertical: 15,
+    paddingVertical: Spacing.md,
     alignItems: 'center',
     borderBottomWidth: 3,
     borderBottomColor: 'transparent',
   },
   tabActive: {
-    borderBottomColor: '#6366f1',
+    borderBottomColor: RobloxTheme.primary,
   },
   tabText: {
-    fontSize: 14,
-    color: '#666',
-    fontWeight: '500',
+    ...Typography.label,
+    color: RobloxTheme.textSecondary,
   },
   tabTextActive: {
-    color: '#6366f1',
+    color: RobloxTheme.primary,
     fontWeight: '700',
   },
   content: {
     flex: 1,
-    padding: 20,
+    padding: Spacing.lg,
   },
   emptyContainer: {
-    paddingVertical: 40,
+    paddingVertical: Spacing.xxl,
     alignItems: 'center',
   },
   emptyText: {
-    fontSize: 16,
-    color: '#666',
+    ...Typography.body,
+    color: RobloxTheme.textSecondary,
     textAlign: 'center',
   },
   leaderboardItem: {
     flexDirection: 'row',
-    backgroundColor: '#fff',
-    padding: 15,
-    borderRadius: 8,
-    marginBottom: 10,
+    backgroundColor: RobloxTheme.backgroundElevated,
+    padding: Spacing.md,
+    borderRadius: BorderRadius.sm,
+    marginBottom: Spacing.sm,
     alignItems: 'center',
-    shadowColor: '#000',
+    shadowColor: RobloxTheme.shadow,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
     shadowRadius: 2,
@@ -262,43 +262,42 @@ const styles = StyleSheet.create({
   },
   leaderboardItemHighlight: {
     borderWidth: 2,
-    borderColor: '#6366f1',
-    backgroundColor: '#ede9fe',
+    borderColor: RobloxTheme.primary,
+    backgroundColor: RobloxTheme.backgroundHighlight,
   },
   rankContainer: {
     width: 40,
     alignItems: 'center',
   },
   rankText: {
-    fontSize: 18,
+    ...Typography.bodyLarge,
     fontWeight: 'bold',
-    color: '#6366f1',
+    color: RobloxTheme.primary,
   },
   userInfo: {
     flex: 1,
-    marginLeft: 15,
+    marginLeft: Spacing.md,
   },
   userName: {
-    fontSize: 16,
+    ...Typography.body,
     fontWeight: '600',
-    color: '#333',
+    color: RobloxTheme.textPrimary,
   },
   userRole: {
-    fontSize: 12,
-    color: '#666',
+    ...Typography.labelSmall,
+    color: RobloxTheme.textSecondary,
     marginTop: 2,
   },
   scoreContainer: {
     alignItems: 'flex-end',
   },
   scoreValue: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#6366f1',
+    ...Typography.h3,
+    color: RobloxTheme.primary,
   },
   scoreLabel: {
     fontSize: 11,
-    color: '#666',
+    color: RobloxTheme.textSecondary,
     marginTop: 2,
   },
 });

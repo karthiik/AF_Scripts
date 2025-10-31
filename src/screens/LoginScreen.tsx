@@ -11,6 +11,7 @@ import {
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types';
 import { useAuth } from '../contexts/AuthContext';
+import { RobloxTheme, Typography, Spacing, BorderRadius } from '../theme/colors';
 
 type LoginScreenProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'Login'>;
@@ -50,6 +51,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
         <TextInput
           style={styles.input}
           placeholder="Email"
+          placeholderTextColor={RobloxTheme.textTertiary}
           value={email}
           onChangeText={setEmail}
           autoCapitalize="none"
@@ -60,6 +62,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
         <TextInput
           style={styles.input}
           placeholder="Password"
+          placeholderTextColor={RobloxTheme.textTertiary}
           value={password}
           onChangeText={setPassword}
           secureTextEntry
@@ -92,55 +95,60 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: RobloxTheme.background,
   },
   content: {
     flex: 1,
     justifyContent: 'center',
-    padding: 20,
+    padding: Spacing.lg,
   },
   title: {
-    fontSize: 36,
-    fontWeight: 'bold',
-    color: '#6366f1',
+    ...Typography.h1,
+    color: RobloxTheme.primary,
     textAlign: 'center',
-    marginBottom: 8,
+    marginBottom: Spacing.sm,
   },
   subtitle: {
-    fontSize: 16,
-    color: '#666',
+    ...Typography.body,
+    color: RobloxTheme.textSecondary,
     textAlign: 'center',
-    marginBottom: 40,
+    marginBottom: Spacing.xxl,
   },
   input: {
-    backgroundColor: '#fff',
-    padding: 15,
-    borderRadius: 8,
-    marginBottom: 15,
+    backgroundColor: RobloxTheme.backgroundElevated,
+    padding: Spacing.md,
+    borderRadius: BorderRadius.md,
+    marginBottom: Spacing.md,
     fontSize: 16,
-    borderWidth: 1,
-    borderColor: '#ddd',
+    borderWidth: 2,
+    borderColor: RobloxTheme.border,
+    color: RobloxTheme.textPrimary,
   },
   button: {
-    backgroundColor: '#6366f1',
-    padding: 15,
-    borderRadius: 8,
+    backgroundColor: RobloxTheme.primary,
+    padding: Spacing.md,
+    borderRadius: BorderRadius.md,
     alignItems: 'center',
-    marginTop: 10,
+    marginTop: Spacing.sm,
+    shadowColor: RobloxTheme.shadow,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.4,
+    shadowRadius: 12,
+    elevation: 6,
   },
   buttonDisabled: {
-    backgroundColor: '#a5a7f7',
+    backgroundColor: RobloxTheme.gray600,
+    shadowOpacity: 0,
   },
   buttonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
+    ...Typography.h4,
+    color: RobloxTheme.textPrimary,
   },
   linkText: {
-    color: '#6366f1',
+    ...Typography.body,
+    color: RobloxTheme.primary,
     textAlign: 'center',
-    marginTop: 20,
-    fontSize: 14,
+    marginTop: Spacing.lg,
   },
 });
 

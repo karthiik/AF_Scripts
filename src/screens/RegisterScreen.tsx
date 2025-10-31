@@ -13,6 +13,7 @@ import {
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList, UserRole } from '../types';
 import { useAuth } from '../contexts/AuthContext';
+import { RobloxTheme, Typography, Spacing, BorderRadius } from '../theme/colors';
 
 type RegisterScreenProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'Register'>;
@@ -77,6 +78,7 @@ const RegisterScreen: React.FC<RegisterScreenProps> = ({ navigation }) => {
           <TextInput
             style={styles.input}
             placeholder="Display Name"
+            placeholderTextColor={RobloxTheme.textTertiary}
             value={displayName}
             onChangeText={setDisplayName}
             editable={!loading}
@@ -85,6 +87,7 @@ const RegisterScreen: React.FC<RegisterScreenProps> = ({ navigation }) => {
           <TextInput
             style={styles.input}
             placeholder="Email"
+            placeholderTextColor={RobloxTheme.textTertiary}
             value={email}
             onChangeText={setEmail}
             autoCapitalize="none"
@@ -95,6 +98,7 @@ const RegisterScreen: React.FC<RegisterScreenProps> = ({ navigation }) => {
           <TextInput
             style={styles.input}
             placeholder="Password"
+            placeholderTextColor={RobloxTheme.textTertiary}
             value={password}
             onChangeText={setPassword}
             secureTextEntry
@@ -104,6 +108,7 @@ const RegisterScreen: React.FC<RegisterScreenProps> = ({ navigation }) => {
           <TextInput
             style={styles.input}
             placeholder="Confirm Password"
+            placeholderTextColor={RobloxTheme.textTertiary}
             value={confirmPassword}
             onChangeText={setConfirmPassword}
             secureTextEntry
@@ -176,7 +181,7 @@ const RegisterScreen: React.FC<RegisterScreenProps> = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: RobloxTheme.background,
   },
   scrollContent: {
     flexGrow: 1,
@@ -184,84 +189,88 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     justifyContent: 'center',
-    padding: 20,
-    paddingTop: 60,
-    paddingBottom: 40,
+    padding: Spacing.lg,
+    paddingTop: Spacing.xxl,
+    paddingBottom: Spacing.xxl,
   },
   title: {
-    fontSize: 36,
-    fontWeight: 'bold',
-    color: '#6366f1',
+    ...Typography.h1,
+    color: RobloxTheme.primary,
     textAlign: 'center',
-    marginBottom: 8,
+    marginBottom: Spacing.sm,
   },
   subtitle: {
-    fontSize: 16,
-    color: '#666',
+    ...Typography.body,
+    color: RobloxTheme.textSecondary,
     textAlign: 'center',
-    marginBottom: 30,
+    marginBottom: Spacing.xl,
   },
   input: {
-    backgroundColor: '#fff',
-    padding: 15,
-    borderRadius: 8,
-    marginBottom: 15,
+    backgroundColor: RobloxTheme.backgroundElevated,
+    padding: Spacing.md,
+    borderRadius: BorderRadius.md,
+    marginBottom: Spacing.md,
     fontSize: 16,
-    borderWidth: 1,
-    borderColor: '#ddd',
+    borderWidth: 2,
+    borderColor: RobloxTheme.border,
+    color: RobloxTheme.textPrimary,
   },
   label: {
-    fontSize: 16,
-    color: '#333',
-    marginBottom: 10,
-    marginTop: 5,
+    ...Typography.body,
+    color: RobloxTheme.textPrimary,
+    marginBottom: Spacing.sm,
+    marginTop: Spacing.xs,
   },
   roleContainer: {
     flexDirection: 'row',
-    marginBottom: 20,
-    gap: 10,
+    marginBottom: Spacing.lg,
+    gap: Spacing.sm,
   },
   roleButton: {
     flex: 1,
-    padding: 15,
-    borderRadius: 8,
+    padding: Spacing.md,
+    borderRadius: BorderRadius.md,
     borderWidth: 2,
-    borderColor: '#ddd',
-    backgroundColor: '#fff',
+    borderColor: RobloxTheme.border,
+    backgroundColor: RobloxTheme.backgroundElevated,
     alignItems: 'center',
   },
   roleButtonActive: {
-    borderColor: '#6366f1',
-    backgroundColor: '#6366f1',
+    borderColor: RobloxTheme.primary,
+    backgroundColor: RobloxTheme.primary,
   },
   roleButtonText: {
-    fontSize: 14,
-    color: '#666',
-    fontWeight: '600',
+    ...Typography.label,
+    color: RobloxTheme.textSecondary,
   },
   roleButtonTextActive: {
-    color: '#fff',
+    color: RobloxTheme.textPrimary,
   },
   button: {
-    backgroundColor: '#6366f1',
-    padding: 15,
-    borderRadius: 8,
+    backgroundColor: RobloxTheme.primary,
+    padding: Spacing.md,
+    borderRadius: BorderRadius.md,
     alignItems: 'center',
-    marginTop: 10,
+    marginTop: Spacing.sm,
+    shadowColor: RobloxTheme.shadow,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.4,
+    shadowRadius: 12,
+    elevation: 6,
   },
   buttonDisabled: {
-    backgroundColor: '#a5a7f7',
+    backgroundColor: RobloxTheme.gray600,
+    shadowOpacity: 0,
   },
   buttonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
+    ...Typography.h4,
+    color: RobloxTheme.textPrimary,
   },
   linkText: {
-    color: '#6366f1',
+    ...Typography.body,
+    color: RobloxTheme.primary,
     textAlign: 'center',
-    marginTop: 20,
-    fontSize: 14,
+    marginTop: Spacing.lg,
   },
 });
 

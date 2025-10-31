@@ -11,6 +11,7 @@ import {
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList, VocabularyCard, UserRole, VocabularyLevel } from '../types';
 import { useAuth } from '../contexts/AuthContext';
+import { RobloxTheme, Typography, Spacing, BorderRadius } from '../theme/colors';
 import {
   getAllVocabularyCards,
   createVocabularyCard,
@@ -205,7 +206,7 @@ const VocabularyManagerScreen: React.FC<VocabularyManagerScreenProps> = ({
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#6366f1" />
+        <ActivityIndicator size="large" color={RobloxTheme.primary} />
       </View>
     );
   }
@@ -246,6 +247,7 @@ const VocabularyManagerScreen: React.FC<VocabularyManagerScreenProps> = ({
           <TextInput
             style={styles.input}
             placeholder="Word or Phrase"
+            placeholderTextColor={RobloxTheme.textTertiary}
             value={newFront}
             onChangeText={setNewFront}
           />
@@ -253,6 +255,7 @@ const VocabularyManagerScreen: React.FC<VocabularyManagerScreenProps> = ({
           <TextInput
             style={[styles.input, styles.textArea]}
             placeholder="Definition"
+            placeholderTextColor={RobloxTheme.textTertiary}
             value={newBack}
             onChangeText={setNewBack}
             multiline
@@ -262,6 +265,7 @@ const VocabularyManagerScreen: React.FC<VocabularyManagerScreenProps> = ({
           <TextInput
             style={[styles.input, styles.textArea]}
             placeholder="Example (optional)"
+            placeholderTextColor={RobloxTheme.textTertiary}
             value={newExample}
             onChangeText={setNewExample}
             multiline
@@ -397,6 +401,7 @@ const VocabularyManagerScreen: React.FC<VocabularyManagerScreenProps> = ({
                 <View style={styles.editForm}>
                   <TextInput
                     style={styles.input}
+                    placeholderTextColor={RobloxTheme.textTertiary}
                     value={editingCard.front}
                     onChangeText={text =>
                       setEditingCard({ ...editingCard, front: text })
@@ -405,6 +410,7 @@ const VocabularyManagerScreen: React.FC<VocabularyManagerScreenProps> = ({
 
                   <TextInput
                     style={[styles.input, styles.textArea]}
+                    placeholderTextColor={RobloxTheme.textTertiary}
                     value={editingCard.back}
                     onChangeText={text =>
                       setEditingCard({ ...editingCard, back: text })
@@ -414,6 +420,7 @@ const VocabularyManagerScreen: React.FC<VocabularyManagerScreenProps> = ({
 
                   <TextInput
                     style={[styles.input, styles.textArea]}
+                    placeholderTextColor={RobloxTheme.textTertiary}
                     value={editingCard.example || ''}
                     onChangeText={text =>
                       setEditingCard({ ...editingCard, example: text })
@@ -485,304 +492,332 @@ const VocabularyManagerScreen: React.FC<VocabularyManagerScreenProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: RobloxTheme.background,
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f5f5f5',
+    backgroundColor: RobloxTheme.background,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 20,
-    backgroundColor: '#fff',
+    padding: Spacing.lg,
+    backgroundColor: RobloxTheme.backgroundElevated,
     borderBottomWidth: 1,
-    borderBottomColor: '#e5e7eb',
+    borderBottomColor: RobloxTheme.border,
   },
   headerTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#333',
+    ...Typography.h4,
+    color: RobloxTheme.textPrimary,
   },
   addButton: {
-    fontSize: 16,
-    color: '#6366f1',
+    ...Typography.body,
+    color: RobloxTheme.primary,
     fontWeight: '600',
   },
   addCardForm: {
-    backgroundColor: '#fff',
-    padding: 20,
+    backgroundColor: RobloxTheme.backgroundElevated,
+    padding: Spacing.lg,
     borderBottomWidth: 1,
-    borderBottomColor: '#e5e7eb',
+    borderBottomColor: RobloxTheme.border,
   },
   input: {
-    backgroundColor: '#f9fafb',
-    padding: 12,
-    borderRadius: 6,
-    marginBottom: 10,
+    backgroundColor: RobloxTheme.backgroundHighlight,
+    padding: Spacing.md,
+    borderRadius: BorderRadius.sm,
+    marginBottom: Spacing.sm,
     borderWidth: 1,
-    borderColor: '#e5e7eb',
-    fontSize: 16,
+    borderColor: RobloxTheme.border,
+    ...Typography.body,
+    color: RobloxTheme.textPrimary,
   },
   textArea: {
     minHeight: 80,
     textAlignVertical: 'top',
   },
   label: {
-    fontSize: 14,
-    color: '#666',
-    marginBottom: 8,
+    ...Typography.label,
+    color: RobloxTheme.textSecondary,
+    marginBottom: Spacing.sm,
   },
   difficultyContainer: {
-    marginBottom: 15,
+    marginBottom: Spacing.md,
   },
   difficultyButtons: {
     flexDirection: 'row',
-    gap: 8,
+    gap: Spacing.sm,
   },
   difficultyButton: {
     flex: 1,
-    padding: 10,
-    borderRadius: 6,
+    padding: Spacing.sm,
+    borderRadius: BorderRadius.sm,
     borderWidth: 1,
-    borderColor: '#e5e7eb',
-    backgroundColor: '#fff',
+    borderColor: RobloxTheme.border,
+    backgroundColor: RobloxTheme.backgroundElevated,
     alignItems: 'center',
   },
   difficultyButtonActive: {
-    backgroundColor: '#6366f1',
-    borderColor: '#6366f1',
+    backgroundColor: RobloxTheme.primary,
+    borderColor: RobloxTheme.primary,
   },
   difficultyButtonText: {
-    fontSize: 14,
-    color: '#666',
+    ...Typography.label,
+    color: RobloxTheme.textSecondary,
   },
   difficultyButtonTextActive: {
-    color: '#fff',
+    color: RobloxTheme.textPrimary,
     fontWeight: '600',
   },
   createButton: {
-    backgroundColor: '#6366f1',
-    padding: 15,
-    borderRadius: 6,
+    backgroundColor: RobloxTheme.primary,
+    padding: Spacing.md,
+    borderRadius: BorderRadius.sm,
     alignItems: 'center',
+    shadowColor: RobloxTheme.shadow,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 4,
   },
   createButtonText: {
-    color: '#fff',
-    fontSize: 16,
+    color: RobloxTheme.textPrimary,
+    ...Typography.body,
     fontWeight: '600',
   },
   cardsList: {
     flex: 1,
-    padding: 20,
+    padding: Spacing.lg,
   },
   emptyContainer: {
-    paddingVertical: 40,
+    paddingVertical: Spacing.xxl,
     alignItems: 'center',
   },
   emptyText: {
-    fontSize: 16,
-    color: '#666',
+    ...Typography.body,
+    color: RobloxTheme.textSecondary,
     textAlign: 'center',
   },
   card: {
-    backgroundColor: '#fff',
-    padding: 15,
-    borderRadius: 8,
-    marginBottom: 15,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
+    backgroundColor: RobloxTheme.backgroundElevated,
+    padding: Spacing.md,
+    borderRadius: BorderRadius.md,
+    marginBottom: Spacing.md,
+    shadowColor: RobloxTheme.shadow,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
     elevation: 2,
   },
   cardHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 10,
+    marginBottom: Spacing.sm,
   },
   cardFront: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
+    ...Typography.bodyLarge,
+    fontWeight: '700',
+    color: RobloxTheme.textPrimary,
     flex: 1,
   },
   difficultyBadge: {
-    backgroundColor: '#ede9fe',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12,
+    backgroundColor: RobloxTheme.backgroundHighlight,
+    paddingHorizontal: Spacing.sm,
+    paddingVertical: Spacing.xs,
+    borderRadius: BorderRadius.md,
+    borderWidth: 1,
+    borderColor: RobloxTheme.primary,
   },
   difficultyBadgeText: {
-    fontSize: 11,
-    color: '#6366f1',
+    ...Typography.labelSmall,
+    color: RobloxTheme.primary,
     fontWeight: '600',
   },
   cardBack: {
-    fontSize: 15,
-    color: '#666',
-    marginBottom: 8,
+    ...Typography.body,
+    color: RobloxTheme.textSecondary,
+    marginBottom: Spacing.sm,
   },
   cardExample: {
-    fontSize: 13,
-    color: '#999',
+    ...Typography.bodySmall,
+    color: RobloxTheme.textTertiary,
     fontStyle: 'italic',
-    marginBottom: 12,
+    marginBottom: Spacing.md,
   },
   cardActions: {
     flexDirection: 'row',
-    gap: 10,
+    gap: Spacing.sm,
   },
   editButton: {
     flex: 1,
-    padding: 10,
-    borderRadius: 6,
-    backgroundColor: '#ede9fe',
+    padding: Spacing.sm,
+    borderRadius: BorderRadius.sm,
+    backgroundColor: RobloxTheme.backgroundHighlight,
+    borderWidth: 1,
+    borderColor: RobloxTheme.primary,
     alignItems: 'center',
   },
   editButtonText: {
-    fontSize: 14,
-    color: '#6366f1',
+    ...Typography.label,
+    color: RobloxTheme.primary,
     fontWeight: '600',
   },
   deleteButton: {
     flex: 1,
-    padding: 10,
-    borderRadius: 6,
-    backgroundColor: '#fee2e2',
+    padding: Spacing.sm,
+    borderRadius: BorderRadius.sm,
+    backgroundColor: RobloxTheme.errorBg,
+    borderWidth: 1,
+    borderColor: RobloxTheme.error,
     alignItems: 'center',
   },
   deleteButtonText: {
-    fontSize: 14,
-    color: '#dc2626',
+    ...Typography.label,
+    color: RobloxTheme.error,
     fontWeight: '600',
   },
   editForm: {
-    gap: 10,
+    gap: Spacing.sm,
   },
   editActions: {
     flexDirection: 'row',
-    gap: 10,
+    gap: Spacing.sm,
   },
   saveButton: {
     flex: 1,
-    padding: 12,
-    borderRadius: 6,
-    backgroundColor: '#22c55e',
+    padding: Spacing.md,
+    borderRadius: BorderRadius.sm,
+    backgroundColor: RobloxTheme.success,
     alignItems: 'center',
+    shadowColor: RobloxTheme.shadow,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 4,
   },
   saveButtonText: {
-    fontSize: 14,
-    color: '#fff',
+    ...Typography.label,
+    color: RobloxTheme.textPrimary,
     fontWeight: '600',
   },
   cancelButton: {
     flex: 1,
-    padding: 12,
-    borderRadius: 6,
-    backgroundColor: '#e5e7eb',
+    padding: Spacing.md,
+    borderRadius: BorderRadius.sm,
+    backgroundColor: RobloxTheme.backgroundHighlight,
+    borderWidth: 1,
+    borderColor: RobloxTheme.border,
     alignItems: 'center',
   },
   cancelButtonText: {
-    fontSize: 14,
-    color: '#666',
+    ...Typography.label,
+    color: RobloxTheme.textSecondary,
     fontWeight: '600',
   },
   levelContainer: {
-    marginBottom: 15,
+    marginBottom: Spacing.md,
   },
   levelButtons: {
     flexDirection: 'row',
-    gap: 8,
+    gap: Spacing.sm,
   },
   levelButton: {
     flex: 1,
-    padding: 10,
-    borderRadius: 6,
+    padding: Spacing.sm,
+    borderRadius: BorderRadius.sm,
     borderWidth: 1,
-    borderColor: '#e5e7eb',
-    backgroundColor: '#fff',
+    borderColor: RobloxTheme.border,
+    backgroundColor: RobloxTheme.backgroundElevated,
     alignItems: 'center',
   },
   levelButtonActive: {
-    backgroundColor: '#6366f1',
-    borderColor: '#6366f1',
+    backgroundColor: RobloxTheme.primary,
+    borderColor: RobloxTheme.primary,
   },
   levelButtonText: {
-    fontSize: 13,
-    color: '#666',
+    ...Typography.bodySmall,
+    color: RobloxTheme.textSecondary,
   },
   levelButtonTextActive: {
-    color: '#fff',
+    color: RobloxTheme.textPrimary,
     fontWeight: '600',
   },
   importSection: {
-    backgroundColor: '#fff',
-    padding: 20,
+    backgroundColor: RobloxTheme.backgroundElevated,
+    padding: Spacing.lg,
     borderBottomWidth: 1,
-    borderBottomColor: '#e5e7eb',
+    borderBottomColor: RobloxTheme.border,
   },
   sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 15,
+    ...Typography.bodyLarge,
+    fontWeight: '700',
+    color: RobloxTheme.textPrimary,
+    marginBottom: Spacing.md,
   },
   levelSelectContainer: {
-    marginBottom: 15,
+    marginBottom: Spacing.md,
   },
   importButtonContainer: {
-    marginBottom: 10,
+    marginBottom: Spacing.sm,
   },
   importButton: {
-    backgroundColor: '#10b981',
-    padding: 15,
-    borderRadius: 8,
+    backgroundColor: RobloxTheme.success,
+    padding: Spacing.md,
+    borderRadius: BorderRadius.md,
     alignItems: 'center',
+    shadowColor: RobloxTheme.shadow,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 4,
   },
   importButtonDisabled: {
-    backgroundColor: '#9ca3af',
+    backgroundColor: RobloxTheme.gray600,
   },
   importButtonText: {
-    color: '#fff',
-    fontSize: 16,
+    color: RobloxTheme.textPrimary,
+    ...Typography.body,
     fontWeight: '600',
   },
   helpText: {
-    fontSize: 12,
-    color: '#666',
+    ...Typography.bodySmall,
+    color: RobloxTheme.textSecondary,
     fontStyle: 'italic',
     lineHeight: 18,
   },
   headerButtons: {
     flexDirection: 'row',
-    gap: 10,
+    gap: Spacing.sm,
   },
   deleteAllContainer: {
-    backgroundColor: '#fef2f2',
-    padding: 15,
+    backgroundColor: RobloxTheme.errorBg,
+    padding: Spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: '#fecaca',
+    borderBottomColor: RobloxTheme.errorBorder,
   },
   deleteAllButton: {
-    backgroundColor: '#ef4444',
-    padding: 12,
-    borderRadius: 6,
+    backgroundColor: RobloxTheme.error,
+    padding: Spacing.md,
+    borderRadius: BorderRadius.sm,
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: Spacing.sm,
+    shadowColor: RobloxTheme.shadow,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 4,
   },
   deleteAllButtonText: {
-    color: '#fff',
-    fontSize: 15,
+    color: RobloxTheme.textPrimary,
+    ...Typography.body,
     fontWeight: '600',
   },
   deleteAllWarning: {
-    fontSize: 11,
-    color: '#991b1b',
+    ...Typography.labelSmall,
+    color: RobloxTheme.error,
     textAlign: 'center',
     fontStyle: 'italic',
   },
